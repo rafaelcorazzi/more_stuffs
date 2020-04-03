@@ -1,0 +1,30 @@
+input {
+    http {
+        port => 5043
+
+    }
+    tcp {
+        port => 5044
+        codec => json
+    }
+}
+filter {
+    mutate {
+        add_field => {
+            "indexName" => "%{logger_name}"
+        }
+    }
+    json {
+        source => "message"
+    }
+}
+output {
+    elasticsearch {
+        hosts => "elasticsearch:9200"
+        index => "%{indexName}-%{+YYYY.MM.dd}"
+    }
+    stdout {
+        codec => json
+    }
+
+}
